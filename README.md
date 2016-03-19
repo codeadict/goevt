@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/codeadict/goevt.svg?branch=master)](https://travis-ci.org/codeadict/goevt)
 [![GoDoc](https://godoc.org/github.com/codeadict/goevt?status.svg)](https://godoc.org/github.com/codeadict/goevt)
+[![Code Coverage](http://gocover.io/_badge/github.com/codeadict/goevt)](http://gocover.io/github.com/codeadict/goevt)
 
 # GoEVT
 

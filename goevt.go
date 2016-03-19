@@ -1,4 +1,3 @@
-//
 // Copyright 2016 Dairon Medina <http://github.com/codeadict>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +14,7 @@
 package goevt
 
 import (
-  "bytes"
-	"encoding/json"
-	"fmt"
-	"io"
-	"io/ioutil"
 	"net/http"
-	"net/url"
 )
 
 const (
@@ -36,5 +29,5 @@ type Client struct {
   // The HTTP client that communicates with the API.
   client *http.Client
 
-    
+
 }
