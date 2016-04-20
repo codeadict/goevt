@@ -14,7 +14,14 @@
 package goevt
 
 import (
+	"bytes"
+	"crypto/tls"
+	"flag"
+	"fmt"
+	"io/ioutil"
 	"net/http"
+	"net/url"
+	"strings"
 )
 
 const (
@@ -29,5 +36,91 @@ type Client struct {
   // The HTTP client that communicates with the API.
   client *http.Client
 
+	BaseURL *url.URL
 
+	// User agent for client
+	UserAgent string
+
+}
+
+var (
+	skipCertVerify = flag.Bool("goevt.skip-cert-check", false,
+		`If set to true, Everythng client will skip certificate checking for https, possibly exposing your system to MITM attack.`)
+)
+
+func NewClient(baseUrl, token string) *Client {
+	config := &tls.Config{InsecureSkipVerify: *skipCertVerify}
+	transport := &http.Transport{
+		Proxy:           http.ProxyFromEnvironment,
+		TLSClientConfig: config,
+	}
+
+	client := &http.Client{Transport: transport}
+
+	if baseUrl == nil {
+		baseUrl = url.Parse(defaultBaseURL)
+	}
+
+	return &Client{
+		BaseUrl: baseUrl,
+		Token:   token,
+		Client:  client,
+	}
+}
+
+func (c *Client) ResourceUrl(url string, params map[string]string) string {
+
+	if params != nil {
+		for key, val := range params {
+			url = strings.Replace(url, key, val, -1)
+		}
+	}
+
+	url = c.BaseUrl + url
+
+	return url
+}
+
+func (c *Client) execRequest(method, url string, body []byte) (*http.Response, error) {
+	var req *http.Request
+	var err error
+
+	if body != nil {
+		reader := bytes.NewReader(body)
+		req, err = http.NewRequest(method, url, reader)
+	} else {
+		req, err = http.NewRequest(method, url, nil)
+	}
+
+	if err != nil {
+		panic("Error while building request for EVT.")
+	}
+
+	resp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("Client.Do error: %q", err)
+	}
+
+	if resp.StatusCode >= http.StatusBadRequest {
+		err = fmt.Errorf("*EVT.buildAndExecRequest failed: <%d> %s", resp.StatusCode, req.URL)
+	}
+
+	return resp, err
+}
+
+func (c *Client) buildAndExecRequest(method, url string, body []byte) ([]byte, error) {
+	resp, err := c.execRequest(method, url, body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	contents, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Printf("%s", err)
+	}
+
+	return contents, err
 }
