@@ -6,8 +6,6 @@
 
 GoEVT is a Go client library for accessing the Evrythng REST API.
 
-Documentation is available on : [godoc](http://godoc.org/github.com/codeadict/goevt)
-
 You can view Everythng API docs here: [https://dashboard.evrythng.com/documentation/api](https://dashboard.evrythng.com/documentation/api)
 
 ## Usage
