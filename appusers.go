@@ -15,7 +15,6 @@ package goevt
 
 import (
     "encoding/json"
-    "fmt"
 )
 
 const (
@@ -83,7 +82,10 @@ func (c *Client) CreateUser(data *User) error {
 
   user = new(User)
   err = json.Unmarshal(created, &user)
-  return user, err
+  if err != nil {
+   return
+  }
+  return user
 }
 
 /*
